@@ -29,15 +29,19 @@ jobs:
           pip3 install cython==0.29.33
           pip3 install buildozer
 
-      - name: Accept Android SDK licenses (non-interactive)
+      - name: Accept Android SDK licenses
         run: |
           mkdir -p ~/.android
-          echo "count=0" > ~/.android/repositories.cfg
-          # Pre-accept all standard licenses
-          yes | sdkmanager --licenses || true
+          touch ~/.android/repositories.cfg
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
       - name: Build APK
         run: |
+          # Force Buildozer to use the correct build-tools
+          export ANDROID_BUILD_TOOLS_VERSION=30.0.3
           buildozer -v android debug
 
       - name: Upload APK
