@@ -23,6 +23,7 @@ android.ndk = 23b
 android.sdk = 30
 android.build_tools = 30.0.3
 android.archs = arm64-v8a, armeabi-v7a
+
 android.allow_backup = True
 android.debuggable = True
 
