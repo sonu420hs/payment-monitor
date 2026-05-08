@@ -40,14 +40,15 @@ jobs:
             openjdk-17-jdk \
             autoconf \
             libtool \
-            pkg-config \
-            zlib1g-dev
+            pkg-config
 
-      - name: Install Cython and Buildozer
+      - name: Install Buildozer and Cython
         run: |
-          pip3 install --upgrade cython buildozer
+          pip3 install --upgrade pip
+          pip3 install cython==0.29.33
+          pip3 install buildozer
 
-      - name: Initialize buildozer (if spec exists)
+      - name: Initialize buildozer (if needed)
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
