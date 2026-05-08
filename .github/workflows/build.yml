@@ -16,43 +16,25 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            python3-pip \
-            python3-setuptools \
-            python3-dev \
-            build-essential \
-            libssl-dev \
-            libffi-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libreadline6-dev \
-            libdb5.3-dev \
-            libgdbm-dev \
-            libsqlite3-dev \
-            libbz2-dev \
-            libexpat1-dev \
-            liblzma-dev \
-            zlib1g-dev \
-            wget \
-            curl \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            autoconf \
-            libtool \
-            pkg-config
+            python3-pip python3-setuptools python3-dev \
+            build-essential libssl-dev libffi-dev \
+            libncurses5-dev libncursesw5-dev libreadline6-dev \
+            libdb5.3-dev libgdbm-dev libsqlite3-dev libbz2-dev \
+            libexpat1-dev liblzma-dev zlib1g-dev wget curl git \
+            zip unzip openjdk-17-jdk autoconf libtool pkg-config
 
-      - name: Install Buildozer and Cython
+      - name: Install Cython and Buildozer
         run: |
           pip3 install --upgrade pip
           pip3 install cython==0.29.33
           pip3 install buildozer
 
-      - name: Initialize buildozer (if needed)
+      - name: Accept Android SDK licenses (non-interactive)
         run: |
-          if [ ! -f buildozer.spec ]; then
-            buildozer init
-          fi
+          mkdir -p ~/.android
+          echo "count=0" > ~/.android/repositories.cfg
+          # Pre-accept all standard licenses
+          yes | sdkmanager --licenses || true
 
       - name: Build APK
         run: |
