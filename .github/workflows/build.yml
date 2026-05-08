@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK (Fixed)
 
 on:
   push:
@@ -29,19 +29,32 @@ jobs:
           pip3 install cython==0.29.33
           pip3 install buildozer
 
-      - name: Accept Android SDK licenses
+      - name: Set up Android SDK (manual)
         run: |
+          # Download command-line tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip -q commandlinetools-linux-9477386_latest.zip -d /tmp/
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
+          mv /tmp/cmdline-tools ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+          export ANDROID_SDK_ROOT=~/.buildozer/android/platform/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          
+          # Accept all licenses
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+          yes | sdkmanager --licenses > /dev/null 2>&1
+          
+          # Install platform 30 and build-tools 30.0.3
+          sdkmanager "platforms;android-30" "build-tools;30.0.3"
+          
+          echo "Android SDK installed with build-tools 30.0.3"
 
-      - name: Build APK
+      - name: Build APK with Buildozer
         run: |
-          # Force Buildozer to use the correct build-tools
-          export ANDROID_BUILD_TOOLS_VERSION=30.0.3
+          export ANDROID_SDK_ROOT=~/.buildozer/android/platform/android-sdk
+          export ANDROID_NDK_ROOT=~/.buildozer/android/platform/android-ndk-r25b
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+          # Force Buildozer to use existing SDK (skip download)
           buildozer -v android debug
 
       - name: Upload APK
